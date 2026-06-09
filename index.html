@@ -123,6 +123,7 @@
     flex: 1;
     border-bottom: 1px solid var(--gris-borde);
     min-height: 0;
+    overflow: hidden;
   }
 
   .actividade:last-child {
@@ -132,15 +133,16 @@
   /* COLUMNA ESQUERDA (aula) */
   .col-aula {
     background: var(--azul);
-    width: clamp(160px, 26%, 260px);
+    width: clamp(140px, 22%, 210px);
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 16px 12px;
-    gap: 8px;
+    padding: 10px 8px;
+    gap: 6px;
     position: relative;
+    overflow: hidden;
   }
 
   .col-aula::after {
@@ -157,6 +159,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: clamp(60px, 9vw, 100px);
+    height: clamp(60px, 9vw, 100px);
+    flex-shrink: 0;
   }
 
   .aula-icona {
@@ -179,7 +184,7 @@
 
   .aula-andar {
     color: rgba(255,255,255,0.75);
-    font-size: clamp(13px, 1.7vw, 18px);
+    font-size: clamp(16px, 2.2vw, 26px);
     text-align: center;
     line-height: 1.3;
   }
@@ -208,13 +213,14 @@
   /* COLUMNA DEREITA (info) */
   .col-info {
     flex: 1;
-    padding: clamp(14px, 2.5vh, 28px) clamp(16px, 3vw, 36px);
+    padding: clamp(10px, 2vh, 20px) clamp(16px, 3vw, 36px);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    gap: 8px;
+    gap: 4px;
     background: white;
+    overflow: hidden;
   }
 
   .act-cod {
@@ -379,9 +385,7 @@ const ICONAS = {
   'salon-actos': `<!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-  
-  
-   viewBox="0 0 60.378101 39.256699"
+   viewBox="46.55468 212.16745 60.378101 39.256699"
    version="1.1"
    id="svg1"
    xml:space="preserve"
@@ -425,7 +429,7 @@ const ICONAS = {
        viewBox="0 0 1 1"
        preserveAspectRatio="xMidYMid"><path
          transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path135" /></marker></defs><g
      id="layer1"
@@ -569,7 +573,7 @@ const ICONAS = {
        viewBox="0 0 1 1"
        preserveAspectRatio="xMidYMid"><path
          transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path135" /></marker></defs><g
      id="layer1"
@@ -648,7 +652,7 @@ const ICONAS = {
        viewBox="0 0 1 1"
        preserveAspectRatio="xMidYMid"><path
          transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path135" /></marker></defs><g
      id="layer1"
@@ -707,7 +711,7 @@ const ICONAS = {
        viewBox="0 0 1 1"
        preserveAspectRatio="xMidYMid"><path
          transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path109" /></marker><marker
        style="overflow:visible"
@@ -720,7 +724,7 @@ const ICONAS = {
        viewBox="0 0 1 1"
        preserveAspectRatio="xMidYMid"><path
          transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path135" /></marker></defs><g
      id="layer1"
@@ -789,7 +793,7 @@ const ICONAS = {
        viewBox="0 0 1 1"
        preserveAspectRatio="xMidYMid"><path
          transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path135" /></marker></defs><g
      id="layer1"
@@ -844,7 +848,7 @@ const ICONAS = {
        viewBox="0 0 1 1"
        preserveAspectRatio="xMidYMid"><path
          transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path109" /></marker><marker
        style="overflow:visible"
@@ -857,7 +861,7 @@ const ICONAS = {
        viewBox="0 0 1 1"
        preserveAspectRatio="xMidYMid"><path
          transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path135" /></marker></defs><g
      id="layer1"
