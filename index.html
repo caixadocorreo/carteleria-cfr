@@ -1159,7 +1159,7 @@ function mostrarDirectorio() {
 
     // Grid 3 columnas
     const grid = document.createElement("div");
-    grid.style.cssText = "display:grid;grid-template-columns:repeat(3,1fr);flex:1;height:100%;";
+    grid.style.cssText = "display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(auto-fill,1fr);flex:1;height:100%;width:100%;";
 
     items.forEach(item => {
       const cel = document.createElement("div");
@@ -1171,13 +1171,19 @@ function mostrarDirectorio() {
         justify-content: center;
         padding: 16px 8px;
         border: 1px solid rgba(255,255,255,0.15);
-        gap: 8px;
+        gap: 6px;
+        min-height: 0;
       `;
 
       // Se é slide 2, buscar sesión de mañá para esta aula
       let sesion_html = '';
       if (idx === 1) {
-        const sesion = DATOS.find(d => d.aula === item.espazo);
+        const sesion = DATOS.find(d => {
+          if (d.aula !== item.espazo) return false;
+          // Só sesións de mañá (inicio antes das 14:00)
+          const h = parseInt((d.horaInicio || "0:0").split(":")[0]);
+          return h < 14;
+        });
         if (sesion) {
           sesion_html = `
             <div style="margin-top:6px;padding:6px 8px;background:rgba(255,255,255,0.15);border-radius:8px;width:90%">
