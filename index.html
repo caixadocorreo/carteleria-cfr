@@ -1199,10 +1199,10 @@ function mostrarDirectorio() {
       const col1 = document.createElement("div");
       col1.style.cssText = "background:var(--azul);width:35%;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 10px;gap:6px;";
       const nomeDiv = document.createElement("div");
-      nomeDiv.style.cssText = "color:white;font-size:clamp(14px,2vw,26px);font-weight:700;text-align:center;line-height:1.2;";
+      nomeDiv.style.cssText = "color:white;font-size:clamp(18px,2.6vw,34px);font-weight:700;text-align:center;line-height:1.2;";
       nomeDiv.textContent = item.espazo;
       const andarDiv = document.createElement("div");
-      andarDiv.style.cssText = "color:white;font-size:clamp(11px,1.5vw,18px);font-weight:700;text-align:center;line-height:1.2;";
+      andarDiv.style.cssText = "color:white;font-size:clamp(14px,1.9vw,22px);font-weight:700;text-align:center;line-height:1.2;";
       andarDiv.textContent = item.andar;
       col1.appendChild(nomeDiv);
       col1.appendChild(andarDiv);
@@ -1216,7 +1216,7 @@ function mostrarDirectorio() {
         if (responsables) {
           responsables.split(';').map(r => r.trim()).filter(Boolean).forEach(r => {
             const d = document.createElement("div");
-            d.style.cssText = "color:var(--azul);font-size:clamp(14px,1.9vw,24px);line-height:1.5;";
+            d.style.cssText = "color:var(--azul);font-size:clamp(16px,2.2vw,28px);line-height:1.5;";
             d.textContent = r;
             col2.appendChild(d);
           });
