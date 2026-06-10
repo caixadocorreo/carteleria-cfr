@@ -1463,11 +1463,5 @@ cargarDatos().then(async () => {
 actualizarHora();
 setInterval(actualizarHora, 10000);
 </script>
-<div id="btn-proba" style="position:fixed;bottom:60px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px">
-  <button onclick="document.querySelector('.cabeceira-titulo').textContent='Directorio';clearInterval(window._timerSesions);mostrarDirectorio()"
-    style="background:#005f99;color:white;border:none;padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer">Ver directorio</button>
-  <button onclick="location.reload()"
-    style="background:#444;color:white;border:none;padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer">Ver sesións</button>
-</div>
 </body>
 </html>
