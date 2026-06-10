@@ -1278,16 +1278,24 @@ async function cargarDatos() {
     DATOS = liñas
       .filter(l => l.trim() !== '')
       .map(liña => {
-        // Xestiona campos con comas dentro de comiñas
-        const cols = liña.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || liña.split(',');
+        // Parseo robusto de CSV con campos entre comiñas e campos baleiros
+        const cols = [];
+        let cur = '', inQ = false;
+        for (let i = 0; i < liña.length; i++) {
+          const c = liña[i];
+          if (c === '"') { inQ = !inQ; }
+          else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+          else { cur += c; }
+        }
+        cols.push(cur.trim());
         return {
-          data:       cols[0]?.replace(/"/g,'').trim(),
-          aula:       cols[1]?.replace(/"/g,'').trim(),
-          cod:        cols[2]?.replace(/"/g,'').trim(),
-          titulo:     cols[3]?.replace(/"/g,'').trim(),
-          relator:    cols[4]?.replace(/"/g,'').trim(),
-          horaInicio: cols[5]?.replace(/"/g,'').trim(),
-          horaFin:    cols[6]?.replace(/"/g,'').trim(),
+          data:       cols[0] || '',
+          aula:       cols[1] || '',
+          cod:        cols[2] || '',
+          titulo:     cols[3] || '',
+          relator:    cols[4] || '',
+          horaInicio: cols[5] || '',
+          horaFin:    cols[6] || '',
         };
       });
   } catch(e) {
@@ -1378,7 +1386,13 @@ function mostrarDirectorio() {
   // Cabeceira: cambiar título
   document.querySelector('.cabeceira-titulo').textContent = 'Directorio';
 
-  const todoSlides = [DIRECTORIO_SLIDE1, DIRECTORIO_SLIDE2];
+  // Filtrar slide 2: só aulas con actividade hoxe
+  const aulasConActividade = DIRECTORIO_SLIDE2.filter(item =>
+    DATOS.some(d => d.aula === item.espazo)
+  );
+  const todoSlides = aulasConActividade.length > 0
+    ? [DIRECTORIO_SLIDE1, aulasConActividade]
+    : [DIRECTORIO_SLIDE1];
   let slideActualDir = 0;
   let timerDir = null;
 
