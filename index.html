@@ -1488,17 +1488,7 @@ setInterval(actualizarHora, 1000);
   corpo.innerHTML = "";
   dotsEl.innerHTML = "";
 
-  if(actividades.length === 0) {
-    corpo.innerHTML = `
-      <div class="sen-actividades">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        <p>Non hai sesións programadas para hoxe</p>
-      </div>`;
-    document.getElementById("contador").textContent = "";
-    return;
-  }
-
-  slides = construirSlides(actividades);
+  slides = actividades.length === 0 ? [] : construirSlides(actividades);
 
   // Posters: intercalar ao final (un slide por póster)
   const posters = PROMOS.filter(p => p.tipo === 'poster');
@@ -1512,6 +1502,16 @@ setInterval(actualizarHora, 1000);
     const pos = Math.floor(Math.random() * (listaSlides.length + 1));
     listaSlides.splice(pos, 0, { especial: p });
   });
+
+  if (listaSlides.length === 0) {
+    corpo.innerHTML = `
+      <div class="sen-actividades">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <p>Non hai sesións programadas para hoxe</p>
+      </div>`;
+    document.getElementById("contador").textContent = "";
+    return;
+  }
 
   listaSlides.forEach((item, idx) => {
     let div;
