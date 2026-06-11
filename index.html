@@ -132,6 +132,16 @@
     opacity: 1;
     pointer-events: auto;
   }
+.slide-imaxe {
+    align-items: center;
+    justify-content: center;
+    background: white;
+  }
+.slide-imaxe img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 
   .actividade {
     display: flex;
@@ -1057,6 +1067,66 @@ const INFO_AULAS = {
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk7p591xyGaL3Fjpz7Eb2yy8N4SuRsXUtvExJ_y64NWveCTBfNLuoM62wNyrHnCljqd_cEUr9G5oaB/pub?gid=0&single=true&output=csv';
 const DIRECTORIO_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTFF0b9bLdq1p9ewcrz6jZKLt1iV3rc9G_ghO7flFwIp4jETsP4eO8oSTdZd8M66oLeTqskUOX5GQuP/pub?gid=0&single=true&output=csv';
 let DATOS = [];
+const CSV_PROMOS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQwJOm8h5JJvFhpTdhbRRb58WfKTuu56nzme1HJivEKRU6NwJr__ypIBXaft6uFiqgiaVaW3h9R6KbQ/pub?gid=0&single=true&output=csv';
+let PROMOS = [];
+
+function parsarDataPromo(str) {
+  if (!str) return null;
+  const [d,m,a] = str.split('/');
+  return new Date(parseInt(a), parseInt(m)-1, parseInt(d));
+}
+
+async function cargarPromos() {
+  if (CSV_PROMOS_URL === 'PENDENTE_URL_PROMOS') return;
+  try {
+    const resp = await fetch(CSV_PROMOS_URL);
+    const texto = await resp.text();
+    const liñas = texto.trim().split('\n').slice(1);
+    const h = new Date(); h.setHours(0,0,0,0);
+    PROMOS = liñas.filter(l => l.trim()).map(l => {
+      const cols = [];
+      let cur='', inQ=false;
+      for (let i=0;i<l.length;i++){
+        const c=l[i];
+        if(c==='"'){inQ=!inQ;}
+        else if(c===','&&!inQ){cols.push(cur.trim());cur='';}
+        else{cur+=c;}
+      }
+      cols.push(cur.trim());
+      const m = (cols[1]||'').match(/drive\.google\.com\/file\/d\/([^/?]+)/);
+      const img = m ? 'https://lh3.googleusercontent.com/d/' + m[1] : (cols[1]||'');
+      return { tipo: (cols[0]||'').toLowerCase().trim(), imagenURL: img, dataInicioVisual: cols[2]||'', dataFin: cols[3]||'' };
+    }).filter(p => {
+      const ini = parsarDataPromo(p.dataInicioVisual);
+      const fin = parsarDataPromo(p.dataFin);
+      if (!ini) return false;
+      if (!fin) return h >= ini;
+      const finEx = new Date(fin); finEx.setDate(finEx.getDate()+1); finEx.setHours(0,0,0,0);
+      return h >= ini && h < finEx;
+    });
+  } catch(e) { console.error('Erro ao cargar promos:', e); }
+}
+
+function renderSlideImaxe(item) {
+  const div = document.createElement('div');
+  div.className = 'slide slide-imaxe';
+  div.dataset.especial = item.tipo;
+  if (item.imagenURL) {
+    const img = document.createElement('img');
+    img.src = item.imagenURL;
+    div.appendChild(img);
+  }
+  return div;
+}
+
+function aplicarCabeceira(tipo) {
+  const tit = document.querySelector('.cabeceira-titulo');
+  if (!tit) return;
+  if (tipo === 'promo') tit.textContent = '+info';
+  else if (tipo === 'directorio') tit.textContent = 'Directorio';
+  else tit.textContent = 'Sesións de hoxe';
+}
+
 
 async function cargarDatos() {
   try {
@@ -1177,15 +1247,43 @@ function mostrarDirectorio() {
   const aulasConActividade = DIRECTORIO_SLIDE2.filter(item =>
     DATOS.some(d => d.aula === item.espazo)
   );
-  const todoSlides = aulasConActividade.length > 0
+  let todoSlides = aulasConActividade.length > 0
     ? [DIRECTORIO_SLIDE1, aulasConActividade]
     : [DIRECTORIO_SLIDE1];
+
+  // Intercalar posters (ao final) e promos (posición aleatoria)
+  const postersDir = PROMOS.filter(p => p.tipo === 'poster');
+  const promosDir = PROMOS.filter(p => p.tipo === 'promo');
+  postersDir.forEach(p => todoSlides.push({ especial: p }));
+  promosDir.forEach(p => {
+    const pos = Math.floor(Math.random() * (todoSlides.length + 1));
+    todoSlides.splice(pos, 0, { especial: p });
+  });
+
   let slideActualDir = 0;
   let timerDir = null;
 
   function renderSlideDir(idx) {
     const items = todoSlides[idx];
     corpo.innerHTML = "";
+
+    if (items && items.especial) {
+      const item = items.especial;
+      aplicarCabeceira(item.tipo === 'promo' ? 'promo' : 'sesions');
+      if (item.imagenURL) {
+        const img = document.createElement('img');
+        img.src = item.imagenURL;
+        img.style.cssText = 'width:100%;height:100%;object-fit:contain;background:white;';
+        corpo.appendChild(img);
+      }
+      dotsEl.innerHTML = todoSlides.map((_,i) =>
+        `<div class="dot${i===idx?' activo':''}" onclick="void(0)"></div>`
+      ).join('');
+      document.getElementById("contador").textContent = `${idx+1} / ${todoSlides.length}`;
+      iniciarBarra();
+      return;
+    }
+    aplicarCabeceira('directorio');
 
     const nFilas = items.length;
     const grid = document.createElement("div");
@@ -1222,13 +1320,14 @@ function mostrarDirectorio() {
           });
         }
       } else {
+        const hoxeComp2 = dataHoxeComp();
         const sesions = DATOS.filter(d => {
-          if (d.aula !== item.espazo) return false;
+          if (d.aula !== item.espazo || d.data !== hoxeComp2) return false;
           const h = parseInt((d.horaInicio || '0:0').split(':')[0]);
           return h < 14;
         });
         const sesionsTarde = DATOS.filter(d => {
-          if (d.aula !== item.espazo) return false;
+          if (d.aula !== item.espazo || d.data !== hoxeComp2) return false;
           const h = parseInt((d.horaInicio || '0:0').split(':')[0]);
           return h >= 14;
         });
@@ -1348,6 +1447,9 @@ function mostrarSlide(idx) {
     ? `${idx+1} / ${slides.length}`
     : "";
 
+  const especial = todos[idx] ? todos[idx].dataset.especial : null;
+  aplicarCabeceira(especial === 'promo' ? 'promo' : 'sesions');
+
   iniciarBarra();
 }
 
@@ -1397,10 +1499,28 @@ setInterval(actualizarHora, 1000);
 
   slides = construirSlides(actividades);
 
-  slides.forEach((sl, idx) => {
-    const div = document.createElement("div");
-    div.className = "slide";
-    div.innerHTML = sl.map(renderActividade).join("");
+  // Posters: intercalar ao final (un slide por póster)
+  const posters = PROMOS.filter(p => p.tipo === 'poster');
+  // Promos: intercalar en posicións aleatorias
+  const promos = PROMOS.filter(p => p.tipo === 'promo');
+
+  // Construír lista mixta de "tipos de slide": null = normal (do array slides), ou obxecto especial
+  let listaSlides = slides.map(sl => ({ especial: null, sl }));
+  posters.forEach(p => listaSlides.push({ especial: p }));
+  promos.forEach(p => {
+    const pos = Math.floor(Math.random() * (listaSlides.length + 1));
+    listaSlides.splice(pos, 0, { especial: p });
+  });
+
+  listaSlides.forEach((item, idx) => {
+    let div;
+    if (item.especial) {
+      div = renderSlideImaxe(item.especial);
+    } else {
+      div = document.createElement("div");
+      div.className = "slide";
+      div.innerHTML = item.sl.map(renderActividade).join("");
+    }
     corpo.appendChild(div);
 
     const dot = document.createElement("div");
@@ -1413,6 +1533,8 @@ setInterval(actualizarHora, 1000);
     });
     dotsEl.appendChild(dot);
   });
+
+  slides = listaSlides; // para que slides.length reflicta o total real
 
   slideActual = 0;
   mostrarSlide(0);
@@ -1433,6 +1555,7 @@ function programarRecarga() {
 
 cargarDatos().then(async () => {
   await cargarDirectorio();
+  await cargarPromos();
   const agora = new Date();
   const dia = agora.getDay();
   if (dia === 0) {
