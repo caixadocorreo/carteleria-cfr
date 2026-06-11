@@ -1244,8 +1244,9 @@ function mostrarDirectorio() {
   document.querySelector('.cabeceira-titulo').textContent = 'Directorio';
 
   // Filtrar slide 2: só aulas con actividade hoxe
+  const hoxeComp = dataHoxeComp();
   const aulasConActividade = DIRECTORIO_SLIDE2.filter(item =>
-    DATOS.some(d => d.aula === item.espazo)
+    DATOS.some(d => d.aula === item.espazo && d.data === hoxeComp)
   );
   let todoSlides = aulasConActividade.length > 0
     ? [DIRECTORIO_SLIDE1, aulasConActividade]
