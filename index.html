@@ -1226,7 +1226,7 @@ async function cargarDirectorio() {
 function eHorarioMañan() {
   const agora = new Date();
   const hora = agora.getHours() + agora.getMinutes() / 60;
-  return hora >= 8 && hora < 14;
+  return hora >= 8 && hora < 13.75; // 13:45
 }
 
 function eDiaLaboral() {
@@ -1397,9 +1397,10 @@ function filtrarHoxe() {
   const hoxe = dataHoxeComp();
   return DATOS.filter(r => {
     if (r.data !== hoxe) return false;
-    // Na vista de sesións só se amosan as de tarde (14:00 en diante)
-    const h = parseInt((r.horaInicio || '0:0').split(':')[0]);
-    return h >= 14;
+    // Na vista de sesións só se amosan as de tarde (13:45 en diante)
+    const partes = (r.horaInicio || '0:0').split(':');
+    const h = parseInt(partes[0]) + (parseInt(partes[1]||'0')/60);
+    return h >= 13.75;
   });
 }
 
