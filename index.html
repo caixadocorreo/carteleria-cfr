@@ -140,7 +140,7 @@
 .slide-imaxe img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
   }
 
   .actividade {
@@ -1274,7 +1274,7 @@ function mostrarDirectorio() {
       if (item.imagenURL) {
         const img = document.createElement('img');
         img.src = item.imagenURL;
-        img.style.cssText = 'width:100%;height:100%;object-fit:contain;background:white;';
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
         corpo.appendChild(img);
       }
       dotsEl.innerHTML = todoSlides.map((_,i) =>
