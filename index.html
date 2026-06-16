@@ -141,7 +141,7 @@
 /* Slide de recomendación de lectura */
 .slide-lectura {
     display: grid !important;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto 1fr 1fr;
     align-items: stretch;
     padding: 0;
     background: white;
@@ -159,25 +159,19 @@
     text-transform: uppercase;
     padding: 10px 32px;
     text-align: center;
-    flex-shrink: 0;
   }
 .lectura-corpo {
-    display: flex;
-    flex-direction: row;
-    min-height: 0;
-    align-items: stretch;
-    overflow: hidden;
+    display: contents;
   }
 .lectura-portada {
-    flex: 0 0 auto;
-    width: 38%;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 28px 20px 28px 40px;
+    padding: 28px 60px 16px 60px;
     box-sizing: border-box;
     opacity: 0;
-    transform: translateX(-24px) scale(0.94);
+    transform: translateY(-24px) scale(0.94);
+    min-height: 0;
   }
 .lectura-portada-inner {
     border-radius: 8px;
@@ -199,36 +193,36 @@
     display: block;
   }
 .lectura-info {
-    flex: 1;
-    text-align: left;
+    text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 12px;
-    padding: 28px 40px 28px 28px;
+    padding: 16px 48px 32px 48px;
     overflow: hidden;
+    min-height: 0;
   }
 .lectura-titulo {
     color: var(--azul);
-    font-size: clamp(24px, 3.5vw, 52px);
+    font-size: clamp(26px, 4vw, 56px);
     font-weight: 700;
     line-height: 1.15;
   }
 .lectura-autor {
     color: var(--azul);
-    font-size: clamp(18px, 2.3vw, 32px);
+    font-size: clamp(18px, 2.5vw, 34px);
     font-weight: 400;
     opacity: 0.75;
   }
 .lectura-recomendacion {
     color: var(--azul);
-    font-size: clamp(15px, 1.9vw, 26px);
+    font-size: clamp(15px, 2vw, 28px);
     line-height: 1.6;
     opacity: 0.85;
   }
 @keyframes lectura-entrada {
-  from { opacity: 0; transform: translateX(-24px) scale(0.94); }
-  to   { opacity: 1; transform: translateX(0) scale(1); }
+  from { opacity: 0; transform: translateY(-24px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes lectura-respirar {
   0%, 100% { transform: scale(1); }
