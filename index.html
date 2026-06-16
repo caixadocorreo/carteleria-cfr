@@ -140,9 +140,9 @@
 
 /* Slide de recomendación de lectura */
 .slide-lectura {
-    flex-direction: column;
+    display: grid !important;
+    grid-template-rows: auto 1fr;
     align-items: stretch;
-    justify-content: flex-start;
     padding: 0;
     background: white;
     overflow: hidden;
@@ -164,11 +164,8 @@
 .lectura-corpo {
     display: flex;
     flex-direction: row;
-    flex: 1 1 auto;
-    height: calc(100% - 50px);
     min-height: 0;
     align-items: stretch;
-    gap: 0;
     overflow: hidden;
   }
 .lectura-portada {
