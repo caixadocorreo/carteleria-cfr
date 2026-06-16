@@ -1481,7 +1481,7 @@ function mostrarDirectorio() {
 
     const nFilas = items.length;
     const grid = document.createElement("div");
-    grid.style.cssText = "display:flex;flex-direction:column;flex:1;height:100%;width:100%;";
+    grid.style.cssText = "position:absolute;top:0;left:0;display:flex;flex-direction:column;width:100%;height:100%;";
 
     items.forEach(item => {
       const fila = document.createElement("div");
