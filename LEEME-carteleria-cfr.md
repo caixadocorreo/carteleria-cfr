@@ -22,6 +22,8 @@ A pantalla recárgase automaticamente cada noite á 00:05 para actualizar a data
 
 O horario oficial do centro é de 09:00 a 14:00. O cambio á vista de tarde adiántase a **13:45** para que o persoal poida comprobar que a información está correctamente configurada antes de marchar.
 
+En calquera vista, as **recomendacións de lectura** e os **pósteres/promos** intercálanse nos ciclos de slides, nas datas configuradas para cada un.
+
 ---
 
 ## 2. Vista "Sesións de hoxe"
@@ -52,7 +54,7 @@ Folla de Google Sheets "Sesións", publicada como CSV. Columnas (por orde):
 
 ---
 
-## 3. Vista "Directorio" (luns–venres, 08:00–14:00)
+## 3. Vista "Directorio" (luns–venres, 08:00–13:45)
 
 Ten dous "slides" que rotan:
 
@@ -74,15 +76,44 @@ Os responsables das aulas (slide 2) **non** veñen desta folla — só se usa pa
 
 ---
 
-## 4. Pósteres e promocións
+## 4. Recomendacións de lectura
+
+Slides especiais que mostran unha recomendación bibliográfica, intercalados en posición aleatoria tanto no ciclo do Directorio como no de Sesións. A cabeceira mostra "+info" mentres dura o slide.
+
+O slide mostra:
+- Portada do libro (imaxe con proporción real, sen deformar)
+- Título, autor/a e texto de recomendación
+
+### Fonte de datos
+Folla de Google Sheets "Lecturas", publicada como CSV (`CSV_LECTURAS_URL` no código). Columnas:
+
+| Columna | Contido |
+|---|---|
+| A | Título do libro |
+| B | Autor/a |
+| C | Texto de recomendación |
+| D | URL da imaxe da portada |
+| E | Data de inicio de visualización (DD/MM/AAAA) |
+| F | Data de fin de visualización (DD/MM/AAAA) — inclusive |
+
+### Imaxes
+- **URLs de Google Drive**: pégase o enlace normal de "Compartir" (`https://drive.google.com/file/d/ID/view...`) e o sistema convérteo automaticamente ao formato `lh3.googleusercontent.com`.
+- Calquera proporción de portada funciona correctamente — a imaxe non se deforma.
+
+### Xestión de datas
+Igual que as promos: pon a `DataFin` en pasado para desactivar sen borrar a fila, e actualiza as datas para reactivar. Podes ter varias recomendacións con datas correlativas para ir rotando ao longo do curso.
+
+---
+
+## 5. Pósteres e promocións
 
 Sistema para inserir slides especiais de imaxe a pantalla completa, intercalados nos ciclos normais (tanto en Sesións como en Directorio).
 
 ### Tipos
 | Tipo | Comportamento | Cabeceira que se mostra |
 |---|---|---|
-| `poster` | Imaxe a pantalla completa, intercalada **ao final** do ciclo | "Sesións de hoxe" (sempre, mesmo se está no ciclo do Directorio) |
-| `promo` | Imaxe a pantalla completa, intercalada en **posición aleatoria** (recalculada cada vez que se carga a páxina) | "+info" |
+| `poster` | Imaxe a pantalla completa, intercalada **ao final** do ciclo | "Sesións de hoxe" |
+| `promo` | Imaxe a pantalla completa, intercalada en **posición aleatoria** | "+info" |
 
 ### Fonte de datos
 Folla de Google Sheets "Promos", publicada como CSV. Columnas:
@@ -99,11 +130,11 @@ Folla de Google Sheets "Promos", publicada como CSV. Columnas:
 - **URLs de Google Drive**: pégase o enlace normal de "Compartir" (`https://drive.google.com/file/d/ID/view...`) e o sistema convérteo automaticamente ao formato `lh3.googleusercontent.com` que funciona sen problemas de CORS.
 
 ### Como gardar un póster/promo para reutilizar máis tarde
-Non fai falta borrar a fila. Pon a `DataFin` en pasado (deixa de mostrarse) e, cando o queiras reactivar, actualiza `DataInicioVisual`/`DataFin` ás novas datas. Podes ter varias filas de tipo `portada`/`poster`/`promo` con datas correlativas para ir rotando contidos ao longo do curso.
+Non fai falta borrar a fila. Pon a `DataFin` en pasado (deixa de mostrarse) e, cando o queiras reactivar, actualiza `DataInicioVisual`/`DataFin` ás novas datas. Podes ter varias filas con datas correlativas para ir rotando contidos ao longo do curso.
 
 ---
 
-## 5. Espazos e iconas configurados
+## 6. Espazos e iconas configurados
 
 Os nomes seguintes están escritos **exactamente** como aparecen no código (`DIRECTORIO_SLIDE1` e `DIRECTORIO_SLIDE2`). O nome do espazo nas follas de Sesións (columna B) e Directorio (columna A) ten que coincidir **letra a letra, incluíndo maiúsculas, minúsculas, acentos e espazos** co valor desta lista, ou o sistema non recoñecerá a aula/espazo e non amosará a icona correcta.
 
@@ -135,19 +166,20 @@ Os nomes seguintes están escritos **exactamente** como aparecen no código (`DI
 
 ---
 
-## 6. Resumo de ligazóns CSV configuradas
+## 7. Resumo de ligazóns CSV configuradas
 
-No código (`index.html`), preto do inicio, atópanse tres constantes coas URLs dos CSV publicados:
+No código (`index.html`), preto do inicio, atópanse catro constantes coas URLs dos CSV publicados:
 
 - `CSV_URL` → folla de Sesións
 - `DIRECTORIO_URL` → folla de Directorio (persoal)
 - `CSV_PROMOS_URL` → folla de Pósteres/Promos
+- `CSV_LECTURAS_URL` → folla de Recomendacións de lectura
 
 Se algunha folla de Sheets cambia de URL de publicación (por exemplo, ao crear unha folla nova desde cero), hai que actualizar a constante correspondente no código e volver subir o ficheiro a GitHub.
 
 ---
 
-## 7. Actualización do sistema
+## 8. Actualización do sistema
 
 Para cambios no deseño, lóxica ou estrutura (non só datos):
 
@@ -155,4 +187,4 @@ Para cambios no deseño, lóxica ou estrutura (non só datos):
 2. Subir a GitHub no repositorio `caixadocorreo/carteleria-cfr`, substituíndo o ficheiro existente (Add file → Upload files)
 3. A páxina publicada en GitHub Pages actualízase automaticamente uns minutos despois
 
-Para cambios de **contido diario** (sesións, responsables, pósteres) **non hai que tocar o código** — só editar as follas de Google Sheets correspondentes.
+Para cambios de **contido diario** (sesións, responsables, pósteres, lecturas) **non hai que tocar o código** — só editar as follas de Google Sheets correspondentes.
