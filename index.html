@@ -141,75 +141,95 @@
 /* Slide de recomendación de lectura */
 .slide-lectura {
     flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    padding: 16px 60px;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0;
     background: white;
     overflow: hidden;
     gap: 0;
   }
 .lectura-etiqueta {
-    display: inline-block;
+    display: block;
     background: var(--azul);
     color: white;
     font-weight: 700;
-    font-size: clamp(18px, 2.5vw, 32px);
+    font-size: clamp(16px, 2vw, 28px);
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    padding: 8px 24px;
-    border-radius: 4px;
+    padding: 10px 32px;
     text-align: center;
     flex-shrink: 0;
   }
+.lectura-corpo {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    align-items: center;
+    gap: 0;
+  }
 .lectura-portada {
     flex: 0 0 auto;
-    max-height: 48%;
-    width: auto;
-    max-width: 38%;
-    border-radius: 6px;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.22);
-    overflow: hidden;
+    width: 38%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 24px 28px 40px;
+    box-sizing: border-box;
     opacity: 0;
-    transform: translateY(-24px) scale(0.94);
+    transform: translateX(-24px) scale(0.94);
+  }
+.lectura-portada-inner {
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    overflow: hidden;
+    max-height: 100%;
+    display: flex;
   }
 .slide-lectura.activo .lectura-portada {
     animation: lectura-entrada 0.8s ease-out forwards, lectura-respirar 4s ease-in-out infinite;
     animation-delay: 0s, 0.8s;
   }
 .lectura-portada img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: calc(100vh - 160px);
+    object-fit: contain;
     display: block;
   }
 .lectura-info {
-    width: 100%;
-    text-align: center;
+    flex: 1;
+    text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    flex-shrink: 0;
+    justify-content: center;
+    gap: 12px;
+    padding: 28px 40px 28px 28px;
+    overflow: hidden;
   }
 .lectura-titulo {
     color: var(--azul);
-    font-size: clamp(22px, 3.2vw, 44px);
+    font-size: clamp(24px, 3.5vw, 52px);
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.15;
   }
 .lectura-autor {
     color: var(--azul);
-    font-size: clamp(17px, 2.2vw, 28px);
+    font-size: clamp(18px, 2.3vw, 32px);
     font-weight: 400;
     opacity: 0.75;
   }
 .lectura-recomendacion {
     color: var(--azul);
-    font-size: clamp(15px, 1.9vw, 24px);
-    line-height: 1.5;
+    font-size: clamp(15px, 1.9vw, 26px);
+    line-height: 1.6;
+    opacity: 0.85;
   }
 @keyframes lectura-entrada {
-  from { opacity: 0; transform: translateY(-24px) scale(0.94); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateX(-24px) scale(0.94); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
 }
 @keyframes lectura-respirar {
   0%, 100% { transform: scale(1); }
@@ -1208,13 +1228,17 @@ function renderSlideLectura(item) {
   const urlImaxe = converterURLDrive(item.imagenURL);
   div.innerHTML = `
     <div class="lectura-etiqueta">Recomendación de lectura</div>
-    <div class="lectura-portada">
-      ${urlImaxe ? `<img src="${urlImaxe}" alt="${item.titulo}">` : ''}
-    </div>
-    <div class="lectura-info">
-      <div class="lectura-titulo">${item.titulo}</div>
-      <div class="lectura-autor">${item.autor}</div>
-      <div class="lectura-recomendacion">${item.recomendacion}</div>
+    <div class="lectura-corpo">
+      <div class="lectura-portada">
+        <div class="lectura-portada-inner">
+          ${urlImaxe ? `<img src="${urlImaxe}" alt="${item.titulo}">` : ''}
+        </div>
+      </div>
+      <div class="lectura-info">
+        <div class="lectura-titulo">${item.titulo}</div>
+        <div class="lectura-autor">${item.autor}</div>
+        <div class="lectura-recomendacion">${item.recomendacion}</div>
+      </div>
     </div>
   `;
   return div;
@@ -1360,7 +1384,15 @@ async function cargarDirectorio() {
     const liñas = texto.trim().split('\n').slice(1);
     RESPONSABLES = {};
     liñas.filter(l => l.trim()).forEach(liña => {
-      const cols = liña.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || liña.split(',');
+      const cols = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < liña.length; i++) {
+        const c = liña[i];
+        if (c === '"') { inQ = !inQ; }
+        else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+        else { cur += c; }
+      }
+      cols.push(cur.trim());
       const espazo = cols[0]?.replace(/"/g,'').trim();
       const resp   = cols[1]?.replace(/"/g,'').trim();
       if (espazo) RESPONSABLES[espazo] = resp || '';
