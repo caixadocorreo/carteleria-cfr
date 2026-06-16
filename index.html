@@ -497,7 +497,14 @@
 // ============================================================
 // CONFIGURACIÓN
 // ============================================================
-const INTERVALO_SEGUNDOS = 15;
+const INTERVALO_SEGUNDOS = 10; // valor por defecto (sesións e directorio)
+const INTERVALOS = {
+  sesions:    10,
+  directorio: 10,
+  lectura:     7,
+  promo:       7,
+  poster:      7,
+};
 const POR_SLIDE = 4;
 
 // ============================================================
@@ -1452,7 +1459,7 @@ function mostrarDirectorio() {
         `<div class="dot${i===idx?' activo':''}" onclick="void(0)"></div>`
       ).join('');
       document.getElementById("contador").textContent = `${idx+1} / ${todoSlides.length}`;
-      iniciarBarra();
+      iniciarBarra(INTERVALOS.lectura);
       return;
     }
     if (items && items.especial) {
@@ -1468,7 +1475,7 @@ function mostrarDirectorio() {
         `<div class="dot${i===idx?' activo':''}" onclick="void(0)"></div>`
       ).join('');
       document.getElementById("contador").textContent = `${idx+1} / ${todoSlides.length}`;
-      iniciarBarra();
+      iniciarBarra(INTERVALOS[item.tipo] || INTERVALOS.promo);
       return;
     }
     aplicarCabeceira('directorio');
@@ -1544,14 +1551,19 @@ function mostrarDirectorio() {
       `<div class="dot${i===idx?' activo':''}" onclick="void(0)"></div>`
     ).join('');
     document.getElementById("contador").textContent = `${idx+1} / ${todoSlides.length}`;
-    iniciarBarra();
+    iniciarBarra(INTERVALOS.directorio);
   }
 
   renderSlideDir(0);
-  timerDir = setInterval(() => {
+  timerDir = setTimeout(function seguinte() {
     slideActualDir = (slideActualDir + 1) % todoSlides.length;
     renderSlideDir(slideActualDir);
-  }, INTERVALO_SEGUNDOS * 1000);
+    const item = todoSlides[slideActualDir];
+    const seg = item?.lectura ? INTERVALOS.lectura
+               : item?.especial ? (INTERVALOS[item.especial.tipo] || INTERVALOS.promo)
+               : INTERVALOS.directorio;
+    timerDir = setTimeout(seguinte, seg * 1000);
+  }, INTERVALOS.directorio * 1000);
 
   return timerDir;
 }
@@ -1637,18 +1649,23 @@ function mostrarSlide(idx) {
     ? `${idx+1} / ${slides.length}`
     : "";
 
+  const item = slides[idx];
   const especial = todos[idx] ? todos[idx].dataset.especial : null;
   aplicarCabeceira(especial === 'promo' ? 'promo' : 'sesions');
 
-  iniciarBarra();
+  const seg = item?.lectura ? INTERVALOS.lectura
+             : item?.especial ? (INTERVALOS[item.especial.tipo] || INTERVALOS.promo)
+             : INTERVALOS.sesions;
+  iniciarBarra(seg);
 }
 
-function iniciarBarra() {
+function iniciarBarra(segundos) {
+  const s = segundos || INTERVALO_SEGUNDOS;
   const fill = document.getElementById("barra-fill");
   fill.style.transition = "none";
   fill.style.width = "0%";
   setTimeout(() => {
-    fill.style.transition = `width ${INTERVALO_SEGUNDOS}s linear`;
+    fill.style.transition = `width ${s}s linear`;
     fill.style.width = "100%";
   }, 50);
 }
@@ -1656,6 +1673,12 @@ function iniciarBarra() {
 function seguinte() {
   slideActual = (slideActual + 1) % slides.length;
   mostrarSlide(slideActual);
+  const item = slides[slideActual];
+  const seg = item?.lectura ? INTERVALOS.lectura
+             : item?.especial ? (INTERVALOS[item.especial.tipo] || INTERVALOS.promo)
+             : INTERVALOS.sesions;
+  clearTimeout(timerInterval);
+  timerInterval = setTimeout(seguinte, seg * 1000);
 }
 
 function init() {
@@ -1724,8 +1747,12 @@ setInterval(actualizarHora, 1000);
     dot.addEventListener("click", () => {
       slideActual = idx;
       mostrarSlide(idx);
-      clearInterval(timerInterval);
-      if(slides.length > 1) timerInterval = setInterval(seguinte, INTERVALO_SEGUNDOS * 1000);
+      clearTimeout(timerInterval);
+      const item = slides[idx];
+      const seg = item?.lectura ? INTERVALOS.lectura
+                 : item?.especial ? (INTERVALOS[item.especial.tipo] || INTERVALOS.promo)
+                 : INTERVALOS.sesions;
+      if(slides.length > 1) timerInterval = setTimeout(seguinte, seg * 1000);
     });
     dotsEl.appendChild(dot);
   });
@@ -1735,9 +1762,13 @@ setInterval(actualizarHora, 1000);
   slideActual = 0;
   mostrarSlide(0);
 
-  clearInterval(timerInterval);
-  if(slides.length > 1)
-    timerInterval = setInterval(seguinte, INTERVALO_SEGUNDOS * 1000);
+  clearTimeout(timerInterval);
+  if(slides.length > 1) {
+    const seg0 = slides[0]?.lectura ? INTERVALOS.lectura
+                : slides[0]?.especial ? (INTERVALOS[slides[0].especial.tipo] || INTERVALOS.promo)
+                : INTERVALOS.sesions;
+    timerInterval = setTimeout(seguinte, seg0 * 1000);
+  }
 }
 
 // Recargar á medianoite para actualizar a data
