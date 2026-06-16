@@ -171,30 +171,26 @@
     box-sizing: border-box;
     opacity: 0;
     transform: translateY(-24px) scale(0.94);
-    overflow: hidden;
     min-height: 0;
-    max-height: 100%;
+    overflow: hidden;
   }
 .lectura-portada-inner {
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.25);
     border: 1px solid rgba(0,0,0,0.10);
     overflow: hidden;
-    display: flex;
-    min-height: 0;
-    max-height: 100%;
+    display: block;
   }
 .slide-lectura.activo .lectura-portada {
     animation: lectura-entrada 0.8s ease-out forwards, lectura-respirar 4s ease-in-out infinite;
     animation-delay: 0s, 0.8s;
   }
 .lectura-portada img {
+    display: block;
     width: auto;
     height: auto;
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain;
-    display: block;
   }
 .lectura-info {
     text-align: left;
