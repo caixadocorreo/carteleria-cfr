@@ -137,6 +137,82 @@
     justify-content: center;
     background: white;
   }
+
+/* Slide de recomendación de lectura */
+.slide-lectura {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 32px;
+    background: #f4f6f9;
+  }
+.slide-lectura.activo .lectura-portada {
+    animation: lectura-entrada 0.8s ease-out forwards, lectura-respirar 4s ease-in-out infinite;
+    animation-delay: 0s, 0.8s;
+  }
+.lectura-portada {
+    width: 40%;
+    max-width: 320px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(-60px) scale(0.92);
+  }
+.lectura-portada img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+.lectura-info {
+    flex: 1;
+    max-width: 600px;
+  }
+.lectura-titulo {
+    color: var(--azul);
+    font-size: clamp(24px, 3.5vw, 44px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+.lectura-autor {
+    color: #555;
+    font-size: clamp(16px, 2vw, 24px);
+    font-weight: 400;
+    margin-bottom: 24px;
+  }
+.lectura-recomendacion {
+    color: #333;
+    font-size: clamp(15px, 1.8vw, 22px);
+    line-height: 1.5;
+  }
+.lectura-etiqueta {
+    display: inline-block;
+    background: var(--azul);
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+@keyframes lectura-entrada {
+  from { opacity: 0; transform: translateX(-60px) scale(0.92); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes lectura-respirar {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.025); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide-lectura.activo .lectura-portada { animation: none; opacity: 1; transform: none; }
+}
 .slide-imaxe img {
     width: 100%;
     height: 100%;
@@ -1068,6 +1144,70 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQk7p591xyGaL3F
 const DIRECTORIO_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTFF0b9bLdq1p9ewcrz6jZKLt1iV3rc9G_ghO7flFwIp4jETsP4eO8oSTdZd8M66oLeTqskUOX5GQuP/pub?gid=0&single=true&output=csv';
 let DATOS = [];
 const CSV_PROMOS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQwJOm8h5JJvFhpTdhbRRb58WfKTuu56nzme1HJivEKRU6NwJr__ypIBXaft6uFiqgiaVaW3h9R6KbQ/pub?gid=0&single=true&output=csv';
+const CSV_LECTURAS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQlX1dbdd9bBGPMoJsXSY4qL4KHVwG1stwUNidAhpJJtAf7Vzjmz9Nq4iN_XLjH-U-LDkRs6kddAytF/pub?gid=0&single=true&output=csv';
+let LECTURAS = [];
+
+function converterURLDrive(url) {
+  if (!url || !url.trim()) return '';
+  const m = url.match(/drive\.google\.com\/file\/d\/([^/?]+)/);
+  if (m) return 'https://lh3.googleusercontent.com/d/' + m[1];
+  return url.trim();
+}
+
+async function cargarLecturas() {
+  if (CSV_LECTURAS_URL === 'PENDENTE_URL_LECTURAS') return;
+  try {
+    const resp = await fetch(CSV_LECTURAS_URL);
+    const texto = await resp.text();
+    const liñas = texto.trim().split('\n').slice(1);
+    const h = new Date(); h.setHours(0,0,0,0);
+    LECTURAS = liñas.filter(l => l.trim()).map(l => {
+      const cols = [];
+      let cur='', inQ=false;
+      for (let i=0;i<l.length;i++){
+        const c=l[i];
+        if(c==='"'){inQ=!inQ;}
+        else if(c===','&&!inQ){cols.push(cur.trim());cur='';}
+        else{cur+=c;}
+      }
+      cols.push(cur.trim());
+      return {
+        titulo: cols[0]||'',
+        autor: cols[1]||'',
+        recomendacion: cols[2]||'',
+        imagenURL: cols[3]||'',
+        dataInicioVisual: cols[4]||'',
+        dataFin: cols[5]||'',
+      };
+    }).filter(p => {
+      const ini = parsarDataPromo(p.dataInicioVisual);
+      const fin = parsarDataPromo(p.dataFin);
+      if (!ini) return false;
+      if (!fin) return h >= ini;
+      const finEx = new Date(fin); finEx.setDate(finEx.getDate()+1); finEx.setHours(0,0,0,0);
+      return h >= ini && h < finEx;
+    });
+  } catch(e) { console.error('Erro ao cargar lecturas:', e); }
+}
+
+function renderSlideLectura(item) {
+  const div = document.createElement('div');
+  div.className = 'slide slide-lectura';
+  div.dataset.especial = 'promo';
+  const urlImaxe = converterURLDrive(item.imagenURL);
+  div.innerHTML = `
+    <div class="lectura-portada">
+      ${urlImaxe ? `<img src="${urlImaxe}" alt="${item.titulo}">` : ''}
+    </div>
+    <div class="lectura-info">
+      <div class="lectura-etiqueta">Recomendación de lectura</div>
+      <div class="lectura-titulo">${item.titulo}</div>
+      <div class="lectura-autor">${item.autor}</div>
+      <div class="lectura-recomendacion">${item.recomendacion}</div>
+    </div>
+  `;
+  return div;
+}
 let PROMOS = [];
 
 function parsarDataPromo(str) {
@@ -1260,6 +1400,10 @@ function mostrarDirectorio() {
     const pos = Math.floor(Math.random() * (todoSlides.length + 1));
     todoSlides.splice(pos, 0, { especial: p });
   });
+  LECTURAS.forEach(l => {
+    const pos = Math.floor(Math.random() * (todoSlides.length + 1));
+    todoSlides.splice(pos, 0, { lectura: l });
+  });
 
   let slideActualDir = 0;
   let timerDir = null;
@@ -1268,6 +1412,18 @@ function mostrarDirectorio() {
     const items = todoSlides[idx];
     corpo.innerHTML = "";
 
+    if (items && items.lectura) {
+      aplicarCabeceira('promo');
+      const wrapper = renderSlideLectura(items.lectura);
+      wrapper.classList.add('activo');
+      corpo.appendChild(wrapper);
+      dotsEl.innerHTML = todoSlides.map((_,i) =>
+        `<div class="dot${i===idx?' activo':''}" onclick="void(0)"></div>`
+      ).join('');
+      document.getElementById("contador").textContent = `${idx+1} / ${todoSlides.length}`;
+      iniciarBarra();
+      return;
+    }
     if (items && items.especial) {
       const item = items.especial;
       aplicarCabeceira(item.tipo === 'promo' ? 'promo' : 'sesions');
@@ -1503,6 +1659,10 @@ setInterval(actualizarHora, 1000);
     const pos = Math.floor(Math.random() * (listaSlides.length + 1));
     listaSlides.splice(pos, 0, { especial: p });
   });
+  LECTURAS.forEach(l => {
+    const pos = Math.floor(Math.random() * (listaSlides.length + 1));
+    listaSlides.splice(pos, 0, { lectura: l });
+  });
 
   if (listaSlides.length === 0) {
     corpo.innerHTML = `
@@ -1516,7 +1676,9 @@ setInterval(actualizarHora, 1000);
 
   listaSlides.forEach((item, idx) => {
     let div;
-    if (item.especial) {
+    if (item.lectura) {
+      div = renderSlideLectura(item.lectura);
+    } else if (item.especial) {
       div = renderSlideImaxe(item.especial);
     } else {
       div = document.createElement("div");
@@ -1558,6 +1720,7 @@ function programarRecarga() {
 cargarDatos().then(async () => {
   await cargarDirectorio();
   await cargarPromos();
+  await cargarLecturas();
   const agora = new Date();
   const dia = agora.getDay();
   if (dia === 0) {
