@@ -1810,12 +1810,28 @@ function programarRecarga() {
   setTimeout(() => { location.reload(); }, manana - agora);
 }
 
+// MODO PROBAS: engadindo ?modo=sesions á URL fórzase a vista de Sesións de hoxe
+// (coma se fose a partir das 13:45) para poder revisala en calquera momento do día.
+// Para saír, quitar o parámetro da URL e recargar.
+function modoProbasForzado() {
+  const params = new URLSearchParams(location.search);
+  return params.get('modo') === 'sesions';
+}
+
 // Modo de visualización segundo día e hora: 'pechado' | 'directorio' | 'sesions'
 function calcularModo() {
+  if (modoProbasForzado()) return 'sesions';
   const dia = new Date().getDay();
   if (dia === 0) return 'pechado';
   if (dia === 6) return filtrarHoxe().length === 0 ? 'pechado' : 'sesions';
   return eHorarioMañan() ? 'directorio' : 'sesions';
+}
+
+function mostrarEtiquetaModoProbas() {
+  const etq = document.createElement('div');
+  etq.textContent = 'MODO PROBAS';
+  etq.style.cssText = 'position:fixed;top:8px;left:8px;z-index:9999;background:#c0392b;color:#fff;font-family:sans-serif;font-weight:700;font-size:14px;padding:4px 10px;border-radius:4px;letter-spacing:0.5px;';
+  document.body.appendChild(etq);
 }
 
 function mostrarPechado() {
@@ -1857,10 +1873,14 @@ cargarDatos().then(async () => {
   else if (MODO_ACTUAL === 'directorio') mostrarDirectorio();
   else init();
   programarRecarga();
-  // Cada 30 s comproba se cambiou o modo (08:00, 13:45…) e, se é así, recarga a páxina
-  setInterval(() => {
-    if (MODO_ACTUAL !== null && calcularModo() !== MODO_ACTUAL) location.reload();
-  }, 30000);
+  if (modoProbasForzado()) {
+    mostrarEtiquetaModoProbas();
+  } else {
+    // Cada 30 s comproba se cambiou o modo (08:00, 13:45…) e, se é así, recarga a páxina
+    setInterval(() => {
+      if (MODO_ACTUAL !== null && calcularModo() !== MODO_ACTUAL) location.reload();
+    }, 30000);
+  }
   // Cada REFRESCO_DATOS_MIN minutos comproba se cambiaron as follas de Google Sheets
   setInterval(comprobarCambiosDatos, REFRESCO_DATOS_MIN * 60 * 1000);
 });

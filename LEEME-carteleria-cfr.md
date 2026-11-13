@@ -4,6 +4,9 @@ Sistema de cartelería para a Smart TV do centro. Funciona como unha páxina web
 
 URL en produción: `https://caixadocorreo.github.io/carteleria-cfr/`
 
+**Modo probas** (para ver pola mañá o que se vai ver pola tarde): engadir `?modo=sesions` á URL —
+`https://caixadocorreo.github.io/carteleria-cfr/?modo=sesions`. Ver detalles na §1.
+
 ---
 
 ## 1. Que mostra e cando
@@ -30,6 +33,13 @@ O horario oficial do centro é de 09:00 a 14:00. O cambio á vista de tarde adi�
 En calquera vista, as **recomendacións de lectura** e os **pósteres/promos** intercálanse nos ciclos de slides, nas datas configuradas para cada un.
 
 **Vista de Sesións e slides especiais:** para que o profesorado vexa axiña a súa aula, as pantallas de sesións **repítense despois de cada slide especial**. O ciclo é: sesións → especial → sesións → especial → … Así, cunha ou dúas pantallas de sesións, unha pantalla volve aparecer pouco despois de pasar (con 2 pantallas de sesións, ata uns 17 s; con 1, uns 7 s; cálculo aproximado a partir dos tempos da §8). A orde dos especiais é: promos e lecturas en orde aleatoria e, ao final, os pósteres. O Directorio non se modificou: alí seguen intercalados como se describe nas §4 e §5.
+
+**Modo probas:** engadindo `?modo=sesions` ao final da URL fórzase a vista de Sesións de hoxe en calquera momento do día (por exemplo pola mañá, para comprobar como se verá pola tarde), cos datos reais de hoxe. Mentres está activo:
+- Aparece unha etiqueta vermella "MODO PROBAS" na esquina superior esquerda, para non confundilo coa vista real.
+- Desactívase o vixilante de cambio de hora (08:00/13:45), para que a proba non se interrompa só.
+- O refresco de datos cada 5 minutos segue activo, así que a proba mostra os datos actuais.
+
+Para saír do modo probas, basta quitar `?modo=sesions` da URL e recargar (ou abrir `https://caixadocorreo.github.io/carteleria-cfr/` sen parámetros).
 
 ---
 
